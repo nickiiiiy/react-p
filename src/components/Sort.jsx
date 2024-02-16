@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { setSort } from "../redux/slices/filterSlice";
+import { setSort, selectSort } from "../redux/slices/filterSlice";
 
 export const sortList = [
   { name: "популярности(DESC)", sortProperty: "rating" },
@@ -13,7 +13,9 @@ export const sortList = [
 
 function Sort() {
   const dispatch = useDispatch();
-  const sort = useSelector((state) => state.filter.sort);
+  // const sort = useSelector((state) => state.filter.sort);
+  const sort = useSelector(selectSort);
+  const sortRef = React.useRef();
 
   const [open, setOpen] = React.useState(false);
 
@@ -21,8 +23,32 @@ function Sort() {
     dispatch(setSort(obj));
     setOpen(false);
   };
+
+  // звкратие попап окна на нажатие в любой области сайта
+  // React.useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (!event.path.includes(sortRef.current)) {
+  //       setOpen(false);
+  //     }
+  //   };
+  //   document.body.addEventListener("click", handleClickOutside);
+  //   return () => {
+  //     document.body.removeEventListener("click", handleClickOutside);
+  //   };
+  // }, []);
+
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!sortRef.current.contains(e.target)) {
+        setOpen();
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   return (
-    <div className="sort">
+    <div ref={sortRef} className="sort">
       <div className="sort__label">
         <svg
           width="10"
