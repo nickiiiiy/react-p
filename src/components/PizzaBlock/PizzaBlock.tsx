@@ -1,7 +1,31 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addItem, selectCartItemById } from "../../redux/slices/cartSlice";
-function PizzaBlock({ id, title, price, imageUrl, sizes, types, rating }) {
+import { Link } from "react-router-dom";
+import {
+  CartItem,
+  addItem,
+  selectCartItemById,
+} from "../../redux/slices/cartSlice";
+
+type PizzaBlockProps = {
+  id: string;
+  title: string;
+  price: number;
+  imageUrl: string;
+  sizes: number[];
+  types: number[];
+  rating: number;
+};
+
+const PizzaBlock: React.FC<PizzaBlockProps> = ({
+  id,
+  title,
+  price,
+  imageUrl,
+  sizes,
+  types,
+  rating,
+}) => {
   const dispatch = useDispatch();
   // const cartItem = useSelector((state) =>
   //   state.cart.items.find((obj) => obj.id === id)
@@ -10,20 +34,27 @@ function PizzaBlock({ id, title, price, imageUrl, sizes, types, rating }) {
 
   const [activeType, setActiveType] = React.useState(0);
   const [activeSize, setActiveSize] = React.useState(0);
+  const [newPrice, setNewPrice] = React.useState(price);
   const addedCount = cartItem ? cartItem.count : 0;
   const typeNames = ["тонкое", "традиционное"];
 
   const onClickAdd = () => {
-    const item = {
+    const item: CartItem = {
       id,
       title,
-      price,
+      // было просто price
+      price: newPrice,
       imageUrl,
-
       size: sizes[activeSize],
       type: typeNames[activeType],
+      count: 0,
     };
     dispatch(addItem(item));
+  };
+  // изменение цены от размера
+  const setSize = (i: number) => {
+    setActiveSize(i);
+    setNewPrice(price + (i + 0) * 50); // Увеличиваем цену на 50 за каждый измененный размер
   };
   //   const [pizzaCount, setPizzaCount] = React.useState(0);
 
@@ -32,8 +63,10 @@ function PizzaBlock({ id, title, price, imageUrl, sizes, types, rating }) {
   //   };
   return (
     <div className="pizza-block">
-      <img className="pizza-block__image" src={imageUrl} alt="Pizza" />
-      <h4 className="pizza-block__title">{title}</h4>
+      <Link key={id} to={`/pizza/${id}`}>
+        <img className="pizza-block__image" src={imageUrl} alt="Pizza" />
+        <h4 className="pizza-block__title">{title}</h4>
+      </Link>
       <div className="pizza-block__selector">
         <ul>
           {types.map((typeId) => (
@@ -50,7 +83,8 @@ function PizzaBlock({ id, title, price, imageUrl, sizes, types, rating }) {
           {sizes.map((size, i) => (
             <li
               key={size}
-              onClick={() => setActiveSize(i)}
+              // onClick={() => setActiveSize(i)}
+              onClick={() => setSize(i)}
               className={activeSize == i ? "active" : ""}
             >
               {size} см.
@@ -59,7 +93,8 @@ function PizzaBlock({ id, title, price, imageUrl, sizes, types, rating }) {
         </ul>
       </div>
       <div className="pizza-block__bottom">
-        <div className="pizza-block__price">от {price} ₽</div>
+        {/*ниже заменил price на newPrice */}
+        <div className="pizza-block__price">от {newPrice} ₽</div>
         <button
           onClick={onClickAdd}
           className="button button--outline button--add"
@@ -82,5 +117,5 @@ function PizzaBlock({ id, title, price, imageUrl, sizes, types, rating }) {
       </div>
     </div>
   );
-}
+};
 export default PizzaBlock;
