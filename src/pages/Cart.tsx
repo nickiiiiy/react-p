@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import CartItem from "../components/CartItem";
@@ -9,6 +9,7 @@ import { selectCart } from "../redux/slices/cartSlice";
 const Cart: React.FC = () => {
   const dispatch = useDispatch();
 
+  const [open, setOpen] = useState(false);
   const { totalPrice, items } = useSelector(selectCart);
   const totalCount = items.reduce(
     (sum: number, item: any) => sum + item.count,
@@ -25,6 +26,7 @@ const Cart: React.FC = () => {
   if (!totalPrice) {
     return <CartEmpty />;
   }
+
   return (
     <div className="container container--cart">
       <div className="cart">
@@ -140,7 +142,24 @@ const Cart: React.FC = () => {
               <span>Вернуться назад</span>
             </Link>
             <div className="button pay-btn">
-              <span>Оплатить сейчас</span>
+              <span onClick={() => setOpen(true)}>Оплатить сейчас</span>
+            </div>
+
+            <div className={`overlay animated ${open ? "show" : ""}`}>
+              <div className="modal">
+                <svg
+                  onClick={() => setOpen(false)}
+                  height="200"
+                  viewBox="0 0 200 200"
+                  width="200"
+                >
+                  <title />
+                  <path d="M114,100l49-49a9.9,9.9,0,0,0-14-14L100,86,51,37A9.9,9.9,0,0,0,37,51l49,49L37,149a9.9,9.9,0,0,0,14,14l49-49,49,49a9.9,9.9,0,0,0,14-14Z" />
+                </svg>
+                <h4>
+                  Для оформления заказа перейдите необходимо авторизоваться
+                </h4>
+              </div>
             </div>
           </div>
         </div>
